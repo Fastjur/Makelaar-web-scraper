@@ -19,12 +19,32 @@ const makelaars: Makelaar[] = [
     platformType: PlatformType.VanSilfhoutEnHogetoorn,
   },
   {
+    name: "van Silfhout & Hogetoorn Page 2",
+    url: "https://www.vansilfhout.nl/",
+    scrapeUrl:
+      "https://www.vansilfhout.nl/woningaanbod/?fwp_status=te-koop&fwp_locaties=delfgauw%2Cdelft%2Cden-hoorn%2Crijswijk&fwp_koopprijs=18500.00%2C434500.00&fwp_oppervlakte=68.00%2C124.00&fwp_kamers=3.00%2C99.00&fwp_paged=2",
+    platformType: PlatformType.VanSilfhoutEnHogetoorn,
+  },
+  {
+    name: "van Silfhout & Hogetoorn Page 3",
+    url: "https://www.vansilfhout.nl/",
+    scrapeUrl:
+      "https://www.vansilfhout.nl/woningaanbod/?fwp_status=te-koop&fwp_locaties=delfgauw%2Cdelft%2Cden-hoorn%2Crijswijk&fwp_koopprijs=18500.00%2C434500.00&fwp_oppervlakte=68.00%2C124.00&fwp_kamers=3.00%2C99.00&fwp_paged=3",
+    platformType: PlatformType.VanSilfhoutEnHogetoorn,
+  },
+  {
     name: "van Daal Makelaardij",
     url: "https://vandaalmakelaardij.nl/",
     scrapeUrl:
       "https://www.vandaalmakelaardij.nl/nl/realtime-listings/consumer?pageKey=",
     debugResponseFile: "test-vandaal-makelaardij.json",
-    platformType: PlatformType.VanDaalMakelaardij,
+    platformType: PlatformType.RealtimeListingsJson,
+  },
+  {
+    name: "Björnd Makelaardij",
+    url: "https://bjornd.nl/",
+    scrapeUrl: "https://www.bjornd.nl/nl/realtime-listings/consumer",
+    platformType: PlatformType.RealtimeListingsJson,
   },
 ];
 
@@ -38,11 +58,12 @@ class App {
   }
 
   async scrape(makelaar: Makelaar): Promise<IHuis[]> {
-    let responseData: string;
+    let responseData: unknown;
     if (USE_DEBUG_HTML) {
       console.warn(`Using debug response file for ${makelaar.name}`);
       if (!makelaar.debugResponseFile) {
-        throw new Error(`Debug response file not set for ${makelaar.name}`);
+        console.warn(`Debug response file not set for ${makelaar.name}`);
+        return [];
       }
       responseData = fs.readFileSync(
         `resources/debugResponseFiles/${makelaar.debugResponseFile}`,
@@ -50,7 +71,7 @@ class App {
       );
     } else {
       const response = await axios.get(makelaar.scrapeUrl);
-      responseData = response.data as string;
+      responseData = response.data;
     }
     // write respons.data to file for debugging
     // fs.writeFileSync('test-vandaal-makelaardij.json', responseData)
@@ -58,7 +79,7 @@ class App {
 
     const processor = domProcessors[makelaar.platformType];
     if (processor) {
-      return processor.processDom(responseData);
+      return processor.processDom(responseData, makelaar.url);
     }
 
     throw new Error(`No processor found for makelaar ${makelaar.name}`);

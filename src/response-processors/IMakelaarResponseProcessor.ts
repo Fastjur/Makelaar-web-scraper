@@ -1,10 +1,10 @@
 import { IHuis } from "../Huis";
 import { PlatformType } from "../makelaar";
 import { VanSilfhoutEnHogetoornDomProcessor } from "./VanSilfhoutEnHogetoornDomProcessor";
-import { VanDaalMakelaardijDomProcessor } from "./VanDaalMakelaardijDomProcessor";
+import { RealtimeListingsJsonResponseProcessor } from "./RealtimeListingsJsonResponseProcessor";
 
 export interface IMakelaarResponseProcessor {
-  processDom(response: unknown): IHuis[];
+  processDom(response: unknown, makelaarUrl: string): IHuis[];
 }
 
 export const makelaarResponseProcessors: Record<
@@ -12,5 +12,5 @@ export const makelaarResponseProcessors: Record<
   IMakelaarResponseProcessor
 > = {
   VanSilfhoutEnHogetoorn: new VanSilfhoutEnHogetoornDomProcessor(),
-  VanDaalMakelaardij: new VanDaalMakelaardijDomProcessor(),
+  RealtimeListingsJson: new RealtimeListingsJsonResponseProcessor(),
 };

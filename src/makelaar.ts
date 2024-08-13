@@ -8,5 +8,5 @@ export type Makelaar = {
 
 export enum PlatformType {
   VanSilfhoutEnHogetoorn = "VanSilfhoutEnHogetoorn",
-  VanDaalMakelaardij = "VanDaalMakelaardij",
+  RealtimeListingsJson = "RealtimeListingsJson",
 }

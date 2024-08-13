@@ -1,7 +1,7 @@
 import { IMakelaarResponseProcessor } from "./IMakelaarResponseProcessor";
 import { Huis, IHuis } from "../Huis";
 
-type VanDaalMakelaardijHouseResponse = {
+type RealtimeListingsJsonHouseResponse = {
   address: string;
   city: string;
   price: string;
@@ -15,9 +15,9 @@ type VanDaalMakelaardijHouseResponse = {
   salesPrice: number;
 };
 
-function isVanDaalMakelaardijResponse(
+function isRealtimeListingsJsonHouseResponse(
   obj: unknown,
-): obj is VanDaalMakelaardijHouseResponse {
+): obj is RealtimeListingsJsonHouseResponse {
   if (typeof obj !== "object" || obj == null) {
     return false;
   }
@@ -47,11 +47,11 @@ function isVanDaalMakelaardijResponse(
   );
 }
 
-export class VanDaalMakelaardijDomProcessor
+export class RealtimeListingsJsonResponseProcessor
   implements IMakelaarResponseProcessor
 {
   private isWithinOurCriteria(
-    response: VanDaalMakelaardijHouseResponse,
+    response: RealtimeListingsJsonHouseResponse,
   ): boolean {
     return (
       response.city === "Delft" &&
@@ -63,22 +63,22 @@ export class VanDaalMakelaardijDomProcessor
     );
   }
 
-  processDom(responseData: unknown): IHuis[] {
+  processDom(responseData: unknown, makelaarUrl: string): IHuis[] {
     if (!Array.isArray(responseData)) {
       console.error("Invalid response data", responseData);
       return [];
     }
     const houses: IHuis[] = responseData
-      .filter(isVanDaalMakelaardijResponse)
+      .filter(isRealtimeListingsJsonHouseResponse)
       .filter(this.isWithinOurCriteria.bind(this))
-      .map((response: VanDaalMakelaardijHouseResponse) => {
+      .map((response: RealtimeListingsJsonHouseResponse) => {
         return new Huis(
           response.address,
           response.city,
           response.price.replace("&euro;", "€"),
           `${response.livingSurface} m²`,
           response.rooms.toString(),
-          `https://vandaalmakelaardij.nl${response.url}`,
+          new URL(response.url, makelaarUrl).href,
         );
       });
 

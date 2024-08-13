@@ -15,7 +15,7 @@ export class VanSilfhoutEnHogetoornDomProcessor
     const aanbod = dom.window.document.querySelector("[data-name='aanbod']");
     const items = aanbod?.querySelectorAll(".objectcontainer");
     if (!items) {
-      console.log("No items found");
+      console.warn("No items found");
       return [];
     }
 
